@@ -1,5 +1,4 @@
 services:
-
   web:
     image: python:3.10-slim
     container_name: demo_web
@@ -10,9 +9,12 @@ services:
       sh -c "pip install -r requirements.txt && python app.py"
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
+      - db
     networks:
       - app_net
-
+     
   redis:
     image: redis:7
     container_name: redis
@@ -20,6 +22,18 @@ services:
       - redis_log:/var/log/redis
     networks:
       - app_net
+
+  db:
+     image: postgres:15
+     container_name: postgres_db
+     environment:
+       POSTGRES_USER: user
+       POSTGRES_PASSWORD: password
+       POSTGRES_DB: postdb
+     ports:
+       - "5432:5432"
+     networks:
+       - app_net
 
 volumes:
   redis_log:
